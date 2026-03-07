@@ -1,0 +1,352 @@
+@import "../../../node_modules/frappe-gantt/dist/frappe-gantt.css";
+
+.stages-gantt {
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --text: #121727;
+  --muted: #5c6682;
+  --line: #d7ddeb;
+  --ok: #1f8f4d;
+  --delayed: #c7770b;
+  --blocked: #b6283d;
+  --done: #1e5bb8;
+  --focus: #0ea5e9;
+  color: var(--text);
+  background: linear-gradient(145deg, #eef3fb 0%, #fdfefe 100%);
+  border-radius: 16px;
+  border: 1px solid #e3e8f3;
+  box-shadow: 0 16px 36px rgba(18, 23, 39, 0.08);
+  padding: 16px;
+}
+
+.stages-gantt__toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.stages-gantt__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.stages-gantt__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.stages-gantt__mode {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  padding: 6px 10px;
+}
+
+.stages-gantt__live {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.stages-gantt__live .admiral-checkbox {
+  margin-right: 2px;
+}
+
+.stages-gantt__chart {
+  position: relative;
+  min-height: 420px;
+  height: 460px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.stages-gantt__sync {
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  border: 1px solid #dde4f2;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  color: #4d5670;
+  font-size: 12px;
+  background: #fbfcff;
+}
+
+.stages-gantt__sync-error {
+  color: #b6283d;
+}
+
+.stages-gantt__chart .gantt-container {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
+}
+
+.stages-gantt__chart .gantt-container .side-header {
+  display: none;
+}
+
+.stages-gantt__chart .gantt .bar-wrapper {
+  outline: none;
+}
+
+.stages-gantt__chart .gantt .bar-wrapper:focus-visible .bar {
+  stroke: var(--focus);
+  stroke-width: 2px;
+}
+
+.stages-gantt__chart .gantt .bar-wrapper .bar {
+  fill: #7a8fbf;
+  rx: 4px;
+  ry: 4px;
+}
+
+.stages-gantt__chart .gantt .bar-wrapper .bar-progress {
+  fill: rgba(255, 255, 255, 0.36);
+}
+
+.stages-gantt__chart .gantt .bar-wrapper.stage-bar--ok .bar {
+  fill: var(--ok);
+}
+
+.stages-gantt__chart .gantt .bar-wrapper.stage-bar--delayed .bar {
+  fill: var(--delayed);
+}
+
+.stages-gantt__chart .gantt .bar-wrapper.stage-bar--blocked .bar {
+  fill: var(--blocked);
+}
+
+.stages-gantt__chart .gantt .bar-wrapper.stage-bar--done .bar {
+  fill: var(--done);
+}
+
+.stages-gantt__chart .gantt .current-highlight {
+  fill: rgba(182, 40, 61, 0.28);
+}
+
+.stages-gantt__chart .gantt .current-date-highlight {
+  stroke: #b6283d;
+  stroke-width: 2px;
+}
+
+.process-tooltip {
+  background: #ffffff;
+  border: 1px solid #d8deeb;
+  border-radius: 12px;
+  box-shadow: 0 16px 36px rgba(9, 13, 23, 0.24);
+  padding: 10px;
+  width: min(420px, 90vw);
+  max-height: 70vh;
+  overflow: auto;
+  color: #111c33;
+  outline: none;
+}
+
+.process-tooltip:focus,
+.process-tooltip:focus-visible {
+  outline: none;
+}
+
+.process-tooltip-shell {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  background: transparent !important;
+}
+
+.process-tooltip-shell:focus,
+.process-tooltip-shell:focus-visible {
+  outline: none !important;
+}
+
+.process-tooltip__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  border-bottom: 1px solid #e6ebf4;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.process-tooltip__title {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.process-tooltip__summary {
+  font-size: 12px;
+  color: #586077;
+}
+
+.process-tooltip__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.process-tooltip__item {
+  border: 1px solid #e6ebf4;
+  border-radius: 8px;
+  padding: 8px;
+  background: #fafcff;
+}
+
+.process-tooltip__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.process-tooltip__name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.process-tooltip__meta {
+  margin-top: 3px;
+  font-size: 12px;
+  color: #646e8a;
+}
+
+.process-tooltip__open {
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.status-chip {
+  font-size: 11px;
+  line-height: 1;
+  border-radius: 999px;
+  padding: 4px 7px;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.status-chip--ok {
+  background: var(--ok);
+}
+
+.status-chip--delayed {
+  background: var(--delayed);
+}
+
+.status-chip--blocked {
+  background: var(--blocked);
+}
+
+.status-chip--done {
+  background: var(--done);
+}
+
+.process-modal__section {
+  margin-top: 12px;
+}
+
+.process-modal__stage,
+.process-modal__updated {
+  font-size: 13px;
+  color: #56617e;
+}
+
+.process-modal__fields {
+  display: grid;
+  gap: 10px;
+}
+
+.process-modal__label {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  color: #2d3753;
+}
+
+.process-modal__checkbox {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.process-modal__fields input,
+.process-modal__fields select,
+.process-modal__fields textarea {
+  border: 1px solid #ccd5e8;
+  border-radius: 8px;
+  font: inherit;
+  padding: 8px;
+  color: #142038;
+  background: #ffffff;
+}
+
+.process-modal__subtitle {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.process-modal__meta {
+  margin: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.process-modal__meta > div {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 8px;
+}
+
+.process-modal__meta dt {
+  color: #65708d;
+}
+
+.process-modal__meta dd {
+  margin: 0;
+  color: #15213a;
+}
+
+.process-modal__hint {
+  margin-top: 8px;
+  color: #59637f;
+  font-size: 12px;
+}
+
+.process-modal__actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .stages-gantt {
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    padding: 12px;
+  }
+
+  .stages-gantt__chart {
+    height: 420px;
+  }
+
+  .process-modal__meta > div {
+    grid-template-columns: 1fr;
+  }
+}

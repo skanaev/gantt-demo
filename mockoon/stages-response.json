@@ -1,0 +1,706 @@
+{
+  "generatedAt": "2026-03-06T12:00:00.000Z",
+  "source": "mockoon",
+  "stages": [
+    {
+      "id": "stage-01",
+      "title": "Stage 1",
+      "start": "2026-03-06T08:00:00.000Z",
+      "processes": [
+        {
+          "id": "proc-001",
+          "title": "Stage 1 process 1",
+          "startAt": "2026-03-06T08:00:00.000Z",
+          "plannedEndAt": "2026-03-06T08:50:00.000Z",
+          "durationMin": 50,
+          "status": "blocked",
+          "delayReason": "Dependency unavailable",
+          "meta": {
+            "owner": "Nikita",
+            "ticket": "OPS-1101",
+            "stageIndex": 1,
+            "processIndex": 1
+          },
+          "updatedAt": "2026-03-06T08:50:00.000Z"
+        },
+        {
+          "id": "proc-002",
+          "title": "Stage 1 process 2",
+          "startAt": "2026-03-06T08:55:00.000Z",
+          "plannedEndAt": "2026-03-06T09:52:00.000Z",
+          "durationMin": 57,
+          "status": "done",
+          "comment": "Completed as planned.",
+          "meta": {
+            "owner": "Sveta",
+            "ticket": "OPS-1202",
+            "stageIndex": 1,
+            "processIndex": 2
+          },
+          "updatedAt": "2026-03-06T09:52:00.000Z"
+        },
+        {
+          "id": "proc-003",
+          "title": "Stage 1 process 3",
+          "startAt": "2026-03-06T09:57:00.000Z",
+          "plannedEndAt": "2026-03-06T11:01:00.000Z",
+          "durationMin": 64,
+          "status": "ok",
+          "meta": {
+            "owner": "Pavel",
+            "ticket": "OPS-1303",
+            "stageIndex": 1,
+            "processIndex": 3
+          },
+          "updatedAt": "2026-03-06T11:01:00.000Z"
+        },
+        {
+          "id": "proc-004",
+          "title": "Stage 1 process 4",
+          "startAt": "2026-03-06T11:06:00.000Z",
+          "plannedEndAt": "2026-03-06T12:17:00.000Z",
+          "durationMin": 71,
+          "status": "delayed",
+          "delayReason": "Waiting for upstream response",
+          "meta": {
+            "owner": "Oleg",
+            "ticket": "OPS-1404",
+            "stageIndex": 1,
+            "processIndex": 4
+          },
+          "updatedAt": "2026-03-06T12:17:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "stage-02",
+      "title": "Stage 2",
+      "start": "2026-03-06T12:32:00.000Z",
+      "processes": [
+        {
+          "id": "proc-005",
+          "title": "Stage 2 process 1",
+          "startAt": "2026-03-06T12:32:00.000Z",
+          "plannedEndAt": "2026-03-06T13:35:00.000Z",
+          "durationMin": 63,
+          "status": "done",
+          "comment": "Completed as planned.",
+          "meta": {
+            "owner": "Sveta",
+            "ticket": "OPS-2101",
+            "stageIndex": 2,
+            "processIndex": 1
+          },
+          "updatedAt": "2026-03-06T13:35:00.000Z"
+        },
+        {
+          "id": "proc-006",
+          "title": "Stage 2 process 2",
+          "startAt": "2026-03-06T13:40:00.000Z",
+          "plannedEndAt": "2026-03-06T14:50:00.000Z",
+          "durationMin": 70,
+          "status": "ok",
+          "meta": {
+            "owner": "Pavel",
+            "ticket": "OPS-2202",
+            "stageIndex": 2,
+            "processIndex": 2
+          },
+          "updatedAt": "2026-03-06T14:50:00.000Z"
+        },
+        {
+          "id": "proc-007",
+          "title": "Stage 2 process 3",
+          "startAt": "2026-03-06T14:55:00.000Z",
+          "plannedEndAt": "2026-03-06T16:12:00.000Z",
+          "durationMin": 77,
+          "status": "delayed",
+          "delayReason": "Waiting for upstream response",
+          "meta": {
+            "owner": "Oleg",
+            "ticket": "OPS-2303",
+            "stageIndex": 2,
+            "processIndex": 3
+          },
+          "updatedAt": "2026-03-06T16:12:00.000Z"
+        },
+        {
+          "id": "proc-008",
+          "title": "Stage 2 process 4",
+          "startAt": "2026-03-06T16:17:00.000Z",
+          "plannedEndAt": "2026-03-06T16:51:00.000Z",
+          "durationMin": 34,
+          "status": "blocked",
+          "delayReason": "Dependency unavailable",
+          "meta": {
+            "owner": "Alina",
+            "ticket": "OPS-2404",
+            "stageIndex": 2,
+            "processIndex": 4
+          },
+          "updatedAt": "2026-03-06T16:51:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "stage-03",
+      "title": "Stage 3",
+      "start": "2026-03-06T17:06:00.000Z",
+      "processes": [
+        {
+          "id": "proc-009",
+          "title": "Stage 3 process 1",
+          "startAt": "2026-03-06T17:06:00.000Z",
+          "plannedEndAt": "2026-03-06T18:22:00.000Z",
+          "durationMin": 76,
+          "status": "ok",
+          "meta": {
+            "owner": "Pavel",
+            "ticket": "OPS-3101",
+            "stageIndex": 3,
+            "processIndex": 1
+          },
+          "updatedAt": "2026-03-06T18:22:00.000Z"
+        },
+        {
+          "id": "proc-010",
+          "title": "Stage 3 process 2",
+          "startAt": "2026-03-06T18:27:00.000Z",
+          "plannedEndAt": "2026-03-06T19:00:00.000Z",
+          "durationMin": 33,
+          "status": "delayed",
+          "delayReason": "Waiting for upstream response",
+          "meta": {
+            "owner": "Oleg",
+            "ticket": "OPS-3202",
+            "stageIndex": 3,
+            "processIndex": 2
+          },
+          "updatedAt": "2026-03-06T19:00:00.000Z"
+        },
+        {
+          "id": "proc-011",
+          "title": "Stage 3 process 3",
+          "startAt": "2026-03-06T19:05:00.000Z",
+          "plannedEndAt": "2026-03-06T19:45:00.000Z",
+          "durationMin": 40,
+          "status": "blocked",
+          "delayReason": "Dependency unavailable",
+          "meta": {
+            "owner": "Alina",
+            "ticket": "OPS-3303",
+            "stageIndex": 3,
+            "processIndex": 3
+          },
+          "updatedAt": "2026-03-06T19:45:00.000Z"
+        },
+        {
+          "id": "proc-012",
+          "title": "Stage 3 process 4",
+          "startAt": "2026-03-06T19:50:00.000Z",
+          "plannedEndAt": "2026-03-06T20:37:00.000Z",
+          "durationMin": 47,
+          "status": "done",
+          "comment": "Completed as planned.",
+          "meta": {
+            "owner": "Denis",
+            "ticket": "OPS-3404",
+            "stageIndex": 3,
+            "processIndex": 4
+          },
+          "updatedAt": "2026-03-06T20:37:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "stage-04",
+      "title": "Stage 4",
+      "start": "2026-03-06T20:52:00.000Z",
+      "processes": [
+        {
+          "id": "proc-013",
+          "title": "Stage 4 process 1",
+          "startAt": "2026-03-06T20:52:00.000Z",
+          "plannedEndAt": "2026-03-06T21:31:00.000Z",
+          "durationMin": 39,
+          "status": "delayed",
+          "delayReason": "Waiting for upstream response",
+          "meta": {
+            "owner": "Oleg",
+            "ticket": "OPS-4101",
+            "stageIndex": 4,
+            "processIndex": 1
+          },
+          "updatedAt": "2026-03-06T21:31:00.000Z"
+        },
+        {
+          "id": "proc-014",
+          "title": "Stage 4 process 2",
+          "startAt": "2026-03-06T21:36:00.000Z",
+          "plannedEndAt": "2026-03-06T22:22:00.000Z",
+          "durationMin": 46,
+          "status": "blocked",
+          "delayReason": "Dependency unavailable",
+          "meta": {
+            "owner": "Alina",
+            "ticket": "OPS-4202",
+            "stageIndex": 4,
+            "processIndex": 2
+          },
+          "updatedAt": "2026-03-06T22:22:00.000Z"
+        },
+        {
+          "id": "proc-015",
+          "title": "Stage 4 process 3",
+          "startAt": "2026-03-06T22:27:00.000Z",
+          "plannedEndAt": "2026-03-06T23:20:00.000Z",
+          "durationMin": 53,
+          "status": "done",
+          "comment": "Completed as planned.",
+          "meta": {
+            "owner": "Denis",
+            "ticket": "OPS-4303",
+            "stageIndex": 4,
+            "processIndex": 3
+          },
+          "updatedAt": "2026-03-06T23:20:00.000Z"
+        },
+        {
+          "id": "proc-016",
+          "title": "Stage 4 process 4",
+          "startAt": "2026-03-06T23:25:00.000Z",
+          "plannedEndAt": "2026-03-07T00:25:00.000Z",
+          "durationMin": 60,
+          "status": "ok",
+          "meta": {
+            "owner": "Marina",
+            "ticket": "OPS-4404",
+            "stageIndex": 4,
+            "processIndex": 4
+          },
+          "updatedAt": "2026-03-07T00:25:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "stage-05",
+      "title": "Stage 5",
+      "start": "2026-03-07T00:40:00.000Z",
+      "processes": [
+        {
+          "id": "proc-017",
+          "title": "Stage 5 process 1",
+          "startAt": "2026-03-07T00:40:00.000Z",
+          "plannedEndAt": "2026-03-07T01:32:00.000Z",
+          "durationMin": 52,
+          "status": "blocked",
+          "delayReason": "Dependency unavailable",
+          "meta": {
+            "owner": "Alina",
+            "ticket": "OPS-5101",
+            "stageIndex": 5,
+            "processIndex": 1
+          },
+          "updatedAt": "2026-03-07T01:32:00.000Z"
+        },
+        {
+          "id": "proc-018",
+          "title": "Stage 5 process 2",
+          "startAt": "2026-03-07T01:37:00.000Z",
+          "plannedEndAt": "2026-03-07T02:36:00.000Z",
+          "durationMin": 59,
+          "status": "done",
+          "comment": "Completed as planned.",
+          "meta": {
+            "owner": "Denis",
+            "ticket": "OPS-5202",
+            "stageIndex": 5,
+            "processIndex": 2
+          },
+          "updatedAt": "2026-03-07T02:36:00.000Z"
+        },
+        {
+          "id": "proc-019",
+          "title": "Stage 5 process 3",
+          "startAt": "2026-03-07T02:41:00.000Z",
+          "plannedEndAt": "2026-03-07T03:47:00.000Z",
+          "durationMin": 66,
+          "status": "ok",
+          "meta": {
+            "owner": "Marina",
+            "ticket": "OPS-5303",
+            "stageIndex": 5,
+            "processIndex": 3
+          },
+          "updatedAt": "2026-03-07T03:47:00.000Z"
+        },
+        {
+          "id": "proc-020",
+          "title": "Stage 5 process 4",
+          "startAt": "2026-03-07T03:52:00.000Z",
+          "plannedEndAt": "2026-03-07T05:05:00.000Z",
+          "durationMin": 73,
+          "status": "delayed",
+          "delayReason": "Waiting for upstream response",
+          "meta": {
+            "owner": "Roman",
+            "ticket": "OPS-5404",
+            "stageIndex": 5,
+            "processIndex": 4
+          },
+          "updatedAt": "2026-03-07T05:05:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "stage-06",
+      "title": "Stage 6",
+      "start": "2026-03-07T05:20:00.000Z",
+      "processes": [
+        {
+          "id": "proc-021",
+          "title": "Stage 6 process 1",
+          "startAt": "2026-03-07T05:20:00.000Z",
+          "plannedEndAt": "2026-03-07T06:25:00.000Z",
+          "durationMin": 65,
+          "status": "done",
+          "comment": "Completed as planned.",
+          "meta": {
+            "owner": "Denis",
+            "ticket": "OPS-6101",
+            "stageIndex": 6,
+            "processIndex": 1
+          },
+          "updatedAt": "2026-03-07T06:25:00.000Z"
+        },
+        {
+          "id": "proc-022",
+          "title": "Stage 6 process 2",
+          "startAt": "2026-03-07T06:30:00.000Z",
+          "plannedEndAt": "2026-03-07T07:42:00.000Z",
+          "durationMin": 72,
+          "status": "ok",
+          "meta": {
+            "owner": "Marina",
+            "ticket": "OPS-6202",
+            "stageIndex": 6,
+            "processIndex": 2
+          },
+          "updatedAt": "2026-03-07T07:42:00.000Z"
+        },
+        {
+          "id": "proc-023",
+          "title": "Stage 6 process 3",
+          "startAt": "2026-03-07T07:47:00.000Z",
+          "plannedEndAt": "2026-03-07T09:06:00.000Z",
+          "durationMin": 79,
+          "status": "delayed",
+          "delayReason": "Waiting for upstream response",
+          "meta": {
+            "owner": "Roman",
+            "ticket": "OPS-6303",
+            "stageIndex": 6,
+            "processIndex": 3
+          },
+          "updatedAt": "2026-03-07T09:06:00.000Z"
+        },
+        {
+          "id": "proc-024",
+          "title": "Stage 6 process 4",
+          "startAt": "2026-03-07T09:11:00.000Z",
+          "plannedEndAt": "2026-03-07T09:47:00.000Z",
+          "durationMin": 36,
+          "status": "blocked",
+          "delayReason": "Dependency unavailable",
+          "meta": {
+            "owner": "Anna",
+            "ticket": "OPS-6404",
+            "stageIndex": 6,
+            "processIndex": 4
+          },
+          "updatedAt": "2026-03-07T09:47:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "stage-07",
+      "title": "Stage 7",
+      "start": "2026-03-07T10:02:00.000Z",
+      "processes": [
+        {
+          "id": "proc-025",
+          "title": "Stage 7 process 1",
+          "startAt": "2026-03-07T10:02:00.000Z",
+          "plannedEndAt": "2026-03-07T11:20:00.000Z",
+          "durationMin": 78,
+          "status": "ok",
+          "meta": {
+            "owner": "Marina",
+            "ticket": "OPS-7101",
+            "stageIndex": 7,
+            "processIndex": 1
+          },
+          "updatedAt": "2026-03-07T11:20:00.000Z"
+        },
+        {
+          "id": "proc-026",
+          "title": "Stage 7 process 2",
+          "startAt": "2026-03-07T11:25:00.000Z",
+          "plannedEndAt": "2026-03-07T12:00:00.000Z",
+          "durationMin": 35,
+          "status": "delayed",
+          "delayReason": "Waiting for upstream response",
+          "meta": {
+            "owner": "Roman",
+            "ticket": "OPS-7202",
+            "stageIndex": 7,
+            "processIndex": 2
+          },
+          "updatedAt": "2026-03-07T12:00:00.000Z"
+        },
+        {
+          "id": "proc-027",
+          "title": "Stage 7 process 3",
+          "startAt": "2026-03-07T12:05:00.000Z",
+          "plannedEndAt": "2026-03-07T12:47:00.000Z",
+          "durationMin": 42,
+          "status": "blocked",
+          "delayReason": "Dependency unavailable",
+          "meta": {
+            "owner": "Anna",
+            "ticket": "OPS-7303",
+            "stageIndex": 7,
+            "processIndex": 3
+          },
+          "updatedAt": "2026-03-07T12:47:00.000Z"
+        },
+        {
+          "id": "proc-028",
+          "title": "Stage 7 process 4",
+          "startAt": "2026-03-07T12:52:00.000Z",
+          "plannedEndAt": "2026-03-07T13:41:00.000Z",
+          "durationMin": 49,
+          "status": "done",
+          "comment": "Completed as planned.",
+          "meta": {
+            "owner": "Ilya",
+            "ticket": "OPS-7404",
+            "stageIndex": 7,
+            "processIndex": 4
+          },
+          "updatedAt": "2026-03-07T13:41:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "stage-08",
+      "title": "Stage 8",
+      "start": "2026-03-07T13:56:00.000Z",
+      "processes": [
+        {
+          "id": "proc-029",
+          "title": "Stage 8 process 1",
+          "startAt": "2026-03-07T13:56:00.000Z",
+          "plannedEndAt": "2026-03-07T14:37:00.000Z",
+          "durationMin": 41,
+          "status": "delayed",
+          "delayReason": "Waiting for upstream response",
+          "meta": {
+            "owner": "Roman",
+            "ticket": "OPS-8101",
+            "stageIndex": 8,
+            "processIndex": 1
+          },
+          "updatedAt": "2026-03-07T14:37:00.000Z"
+        },
+        {
+          "id": "proc-030",
+          "title": "Stage 8 process 2",
+          "startAt": "2026-03-07T14:42:00.000Z",
+          "plannedEndAt": "2026-03-07T15:30:00.000Z",
+          "durationMin": 48,
+          "status": "blocked",
+          "delayReason": "Dependency unavailable",
+          "meta": {
+            "owner": "Anna",
+            "ticket": "OPS-8202",
+            "stageIndex": 8,
+            "processIndex": 2
+          },
+          "updatedAt": "2026-03-07T15:30:00.000Z"
+        },
+        {
+          "id": "proc-031",
+          "title": "Stage 8 process 3",
+          "startAt": "2026-03-07T15:35:00.000Z",
+          "plannedEndAt": "2026-03-07T16:30:00.000Z",
+          "durationMin": 55,
+          "status": "done",
+          "comment": "Completed as planned.",
+          "meta": {
+            "owner": "Ilya",
+            "ticket": "OPS-8303",
+            "stageIndex": 8,
+            "processIndex": 3
+          },
+          "updatedAt": "2026-03-07T16:30:00.000Z"
+        },
+        {
+          "id": "proc-032",
+          "title": "Stage 8 process 4",
+          "startAt": "2026-03-07T16:35:00.000Z",
+          "plannedEndAt": "2026-03-07T17:37:00.000Z",
+          "durationMin": 62,
+          "status": "ok",
+          "meta": {
+            "owner": "Nikita",
+            "ticket": "OPS-8404",
+            "stageIndex": 8,
+            "processIndex": 4
+          },
+          "updatedAt": "2026-03-07T17:37:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "stage-09",
+      "title": "Stage 9",
+      "start": "2026-03-07T17:52:00.000Z",
+      "processes": [
+        {
+          "id": "proc-033",
+          "title": "Stage 9 process 1",
+          "startAt": "2026-03-07T17:52:00.000Z",
+          "plannedEndAt": "2026-03-07T18:46:00.000Z",
+          "durationMin": 54,
+          "status": "blocked",
+          "delayReason": "Dependency unavailable",
+          "meta": {
+            "owner": "Anna",
+            "ticket": "OPS-9101",
+            "stageIndex": 9,
+            "processIndex": 1
+          },
+          "updatedAt": "2026-03-07T18:46:00.000Z"
+        },
+        {
+          "id": "proc-034",
+          "title": "Stage 9 process 2",
+          "startAt": "2026-03-07T18:51:00.000Z",
+          "plannedEndAt": "2026-03-07T19:52:00.000Z",
+          "durationMin": 61,
+          "status": "done",
+          "comment": "Completed as planned.",
+          "meta": {
+            "owner": "Ilya",
+            "ticket": "OPS-9202",
+            "stageIndex": 9,
+            "processIndex": 2
+          },
+          "updatedAt": "2026-03-07T19:52:00.000Z"
+        },
+        {
+          "id": "proc-035",
+          "title": "Stage 9 process 3",
+          "startAt": "2026-03-07T19:57:00.000Z",
+          "plannedEndAt": "2026-03-07T21:05:00.000Z",
+          "durationMin": 68,
+          "status": "ok",
+          "meta": {
+            "owner": "Nikita",
+            "ticket": "OPS-9303",
+            "stageIndex": 9,
+            "processIndex": 3
+          },
+          "updatedAt": "2026-03-07T21:05:00.000Z"
+        },
+        {
+          "id": "proc-036",
+          "title": "Stage 9 process 4",
+          "startAt": "2026-03-07T21:10:00.000Z",
+          "plannedEndAt": "2026-03-07T22:25:00.000Z",
+          "durationMin": 75,
+          "status": "delayed",
+          "delayReason": "Waiting for upstream response",
+          "meta": {
+            "owner": "Sveta",
+            "ticket": "OPS-9404",
+            "stageIndex": 9,
+            "processIndex": 4
+          },
+          "updatedAt": "2026-03-07T22:25:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "stage-10",
+      "title": "Stage 10",
+      "start": "2026-03-07T22:40:00.000Z",
+      "processes": [
+        {
+          "id": "proc-037",
+          "title": "Stage 10 process 1",
+          "startAt": "2026-03-07T22:40:00.000Z",
+          "plannedEndAt": "2026-03-07T23:47:00.000Z",
+          "durationMin": 67,
+          "status": "done",
+          "comment": "Completed as planned.",
+          "meta": {
+            "owner": "Ilya",
+            "ticket": "OPS-10101",
+            "stageIndex": 10,
+            "processIndex": 1
+          },
+          "updatedAt": "2026-03-07T23:47:00.000Z"
+        },
+        {
+          "id": "proc-038",
+          "title": "Stage 10 process 2",
+          "startAt": "2026-03-07T23:52:00.000Z",
+          "plannedEndAt": "2026-03-08T01:06:00.000Z",
+          "durationMin": 74,
+          "status": "ok",
+          "meta": {
+            "owner": "Nikita",
+            "ticket": "OPS-10202",
+            "stageIndex": 10,
+            "processIndex": 2
+          },
+          "updatedAt": "2026-03-08T01:06:00.000Z"
+        },
+        {
+          "id": "proc-039",
+          "title": "Stage 10 process 3",
+          "startAt": "2026-03-08T01:11:00.000Z",
+          "plannedEndAt": "2026-03-08T01:42:00.000Z",
+          "durationMin": 31,
+          "status": "delayed",
+          "delayReason": "Waiting for upstream response",
+          "meta": {
+            "owner": "Sveta",
+            "ticket": "OPS-10303",
+            "stageIndex": 10,
+            "processIndex": 3
+          },
+          "updatedAt": "2026-03-08T01:42:00.000Z"
+        },
+        {
+          "id": "proc-040",
+          "title": "Stage 10 process 4",
+          "startAt": "2026-03-08T01:47:00.000Z",
+          "plannedEndAt": "2026-03-08T02:25:00.000Z",
+          "durationMin": 38,
+          "status": "blocked",
+          "delayReason": "Dependency unavailable",
+          "meta": {
+            "owner": "Pavel",
+            "ticket": "OPS-10404",
+            "stageIndex": 10,
+            "processIndex": 4
+          },
+          "updatedAt": "2026-03-08T02:25:00.000Z"
+        }
+      ]
+    }
+  ]
+}

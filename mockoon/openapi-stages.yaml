@@ -1,0 +1,576 @@
+openapi: 3.0.3
+info:
+  title: Stages API
+  version: 1.0.0
+  description: API for Gantt stages and process updates
+servers:
+  - url: http://localhost:3001
+paths:
+  /api/stages:
+    get:
+      summary: Get stages for gantt viewer
+      operationId: getStages
+      responses:
+        "200":
+          description: Stages payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StagesResponse"
+              example:
+                generatedAt: "2026-03-06T12:00:00.000Z"
+                source: mockoon
+                stages:
+                  - id: stage-01-intake
+                    title: Intake
+                    start: "2026-03-06T08:00:00.000Z"
+                    processes:
+                      - id: proc-001
+                        title: Collect source data
+                        startAt: "2026-03-06T08:00:00.000Z"
+                        plannedEndAt: "2026-03-06T08:45:00.000Z"
+                        durationMin: 45
+                        status: done
+                        comment: Export finished.
+                        meta:
+                          owner: Anna
+                          ticket: OPS-101
+                        updatedAt: "2026-03-06T08:45:00.000Z"
+                      - id: proc-002
+                        title: Validate required fields
+                        startAt: "2026-03-06T08:50:00.000Z"
+                        plannedEndAt: "2026-03-06T09:40:00.000Z"
+                        durationMin: 50
+                        status: done
+                        meta:
+                          owner: Ilya
+                          ticket: OPS-114
+                        updatedAt: "2026-03-06T09:40:00.000Z"
+                      - id: proc-003
+                        title: Normalize timezone
+                        startAt: "2026-03-06T09:45:00.000Z"
+                        plannedEndAt: "2026-03-06T10:25:00.000Z"
+                        durationMin: 40
+                        status: ok
+                        meta:
+                          owner: Nikita
+                          ticket: INT-33
+                        updatedAt: "2026-03-06T10:25:00.000Z"
+                      - id: proc-004
+                        title: Build payload
+                        startAt: "2026-03-06T10:30:00.000Z"
+                        plannedEndAt: "2026-03-06T11:00:00.000Z"
+                        durationMin: 30
+                        status: delayed
+                        delayReason: Waiting for source fix
+                        meta:
+                          owner: Sveta
+                          queue: etl-stage-a
+                        updatedAt: "2026-03-06T11:00:00.000Z"
+                  - id: stage-02-precheck
+                    title: Precheck
+                    start: "2026-03-06T11:05:00.000Z"
+                    processes:
+                      - id: proc-005
+                        title: Schema pre-check
+                        startAt: "2026-03-06T11:05:00.000Z"
+                        plannedEndAt: "2026-03-06T11:40:00.000Z"
+                        durationMin: 35
+                        status: done
+                        meta:
+                          owner: Pavel
+                          ticket: QA-201
+                        updatedAt: "2026-03-06T11:40:00.000Z"
+                      - id: proc-006
+                        title: Security pre-check
+                        startAt: "2026-03-06T11:45:00.000Z"
+                        plannedEndAt: "2026-03-06T12:35:00.000Z"
+                        durationMin: 50
+                        status: blocked
+                        delayReason: Token expired
+                        meta:
+                          owner: Oleg
+                          ticket: AUTH-52
+                        updatedAt: "2026-03-06T12:35:00.000Z"
+                      - id: proc-007
+                        title: Retry setup
+                        startAt: "2026-03-06T12:40:00.000Z"
+                        plannedEndAt: "2026-03-06T13:15:00.000Z"
+                        durationMin: 35
+                        status: ok
+                        meta:
+                          owner: Alina
+                          retries: 2
+                        updatedAt: "2026-03-06T13:15:00.000Z"
+                  - id: stage-03-enrichment
+                    title: Enrichment
+                    start: "2026-03-06T13:20:00.000Z"
+                    processes:
+                      - id: proc-008
+                        title: Parse profiles
+                        startAt: "2026-03-06T13:20:00.000Z"
+                        plannedEndAt: "2026-03-06T14:00:00.000Z"
+                        durationMin: 40
+                        status: done
+                        meta:
+                          owner: Marina
+                          ticket: ENR-301
+                        updatedAt: "2026-03-06T14:00:00.000Z"
+                      - id: proc-009
+                        title: Resolve references
+                        startAt: "2026-03-06T14:05:00.000Z"
+                        plannedEndAt: "2026-03-06T14:50:00.000Z"
+                        durationMin: 45
+                        status: done
+                        meta:
+                          owner: Roman
+                          ticket: ENR-305
+                        updatedAt: "2026-03-06T14:50:00.000Z"
+                      - id: proc-010
+                        title: Fill derived fields
+                        startAt: "2026-03-06T14:55:00.000Z"
+                        plannedEndAt: "2026-03-06T15:45:00.000Z"
+                        durationMin: 50
+                        status: ok
+                        meta:
+                          owner: Fedor
+                          ticket: ENR-309
+                        updatedAt: "2026-03-06T15:45:00.000Z"
+                      - id: proc-011
+                        title: Compute risk score
+                        startAt: "2026-03-06T15:50:00.000Z"
+                        plannedEndAt: "2026-03-06T16:25:00.000Z"
+                        durationMin: 35
+                        status: delayed
+                        delayReason: Queue lag
+                        meta:
+                          owner: Denis
+                          queue: score-high
+                        updatedAt: "2026-03-06T16:25:00.000Z"
+                      - id: proc-012
+                        title: Persist enrichment
+                        startAt: "2026-03-06T16:30:00.000Z"
+                        plannedEndAt: "2026-03-06T17:00:00.000Z"
+                        durationMin: 30
+                        status: ok
+                        meta:
+                          owner: Natalia
+                          ticket: ENR-312
+                        updatedAt: "2026-03-06T17:00:00.000Z"
+                  - id: stage-04-routing
+                    title: Routing
+                    start: "2026-03-06T17:05:00.000Z"
+                    processes:
+                      - id: proc-013
+                        title: Prepare route matrix
+                        startAt: "2026-03-06T17:05:00.000Z"
+                        plannedEndAt: "2026-03-06T17:55:00.000Z"
+                        durationMin: 50
+                        status: done
+                        meta:
+                          owner: Kirill
+                          ticket: ROU-401
+                        updatedAt: "2026-03-06T17:55:00.000Z"
+                      - id: proc-014
+                        title: Match channels
+                        startAt: "2026-03-06T18:00:00.000Z"
+                        plannedEndAt: "2026-03-06T18:45:00.000Z"
+                        durationMin: 45
+                        status: ok
+                        meta:
+                          owner: Ilya
+                          ticket: ROU-405
+                        updatedAt: "2026-03-06T18:45:00.000Z"
+                      - id: proc-015
+                        title: Push route rules
+                        startAt: "2026-03-06T18:50:00.000Z"
+                        plannedEndAt: "2026-03-06T19:30:00.000Z"
+                        durationMin: 40
+                        status: ok
+                        meta:
+                          owner: Anna
+                          ticket: ROU-408
+                        updatedAt: "2026-03-06T19:30:00.000Z"
+                  - id: stage-05-integration-a
+                    title: Integration A
+                    start: "2026-03-06T19:35:00.000Z"
+                    processes:
+                      - id: proc-016
+                        title: Start partner sync A
+                        startAt: "2026-03-06T19:35:00.000Z"
+                        plannedEndAt: "2026-03-06T20:20:00.000Z"
+                        durationMin: 45
+                        status: done
+                        meta:
+                          owner: Pavel
+                          partner: BillingCore
+                        updatedAt: "2026-03-06T20:20:00.000Z"
+                      - id: proc-017
+                        title: Validate contract A
+                        startAt: "2026-03-06T20:25:00.000Z"
+                        plannedEndAt: "2026-03-06T21:35:00.000Z"
+                        durationMin: 70
+                        status: blocked
+                        delayReason: Contract endpoint unavailable
+                        meta:
+                          owner: Oleg
+                          ticket: INT-501
+                        updatedAt: "2026-03-06T21:35:00.000Z"
+                      - id: proc-018
+                        title: Retry failed batches A
+                        startAt: "2026-03-06T21:40:00.000Z"
+                        plannedEndAt: "2026-03-06T22:15:00.000Z"
+                        durationMin: 35
+                        status: delayed
+                        delayReason: Dead letter queue growth
+                        meta:
+                          owner: Denis
+                          queue: dlq-a
+                        updatedAt: "2026-03-06T22:15:00.000Z"
+                      - id: proc-019
+                        title: Finalize sync A
+                        startAt: "2026-03-06T22:20:00.000Z"
+                        plannedEndAt: "2026-03-06T22:50:00.000Z"
+                        durationMin: 30
+                        status: ok
+                        meta:
+                          owner: Alina
+                          ticket: INT-509
+                        updatedAt: "2026-03-06T22:50:00.000Z"
+                  - id: stage-06-integration-b
+                    title: Integration B
+                    start: "2026-03-06T22:55:00.000Z"
+                    processes:
+                      - id: proc-020
+                        title: Start partner sync B
+                        startAt: "2026-03-06T22:55:00.000Z"
+                        plannedEndAt: "2026-03-06T23:35:00.000Z"
+                        durationMin: 40
+                        status: done
+                        meta:
+                          owner: Roman
+                          partner: RiskHub
+                        updatedAt: "2026-03-06T23:35:00.000Z"
+                      - id: proc-021
+                        title: Apply mapping B
+                        startAt: "2026-03-06T23:40:00.000Z"
+                        plannedEndAt: "2026-03-07T00:20:00.000Z"
+                        durationMin: 40
+                        status: done
+                        meta:
+                          owner: Marina
+                          ticket: INT-601
+                        updatedAt: "2026-03-07T00:20:00.000Z"
+                      - id: proc-022
+                        title: Finalize sync B
+                        startAt: "2026-03-07T00:25:00.000Z"
+                        plannedEndAt: "2026-03-07T01:10:00.000Z"
+                        durationMin: 45
+                        status: ok
+                        meta:
+                          owner: Natalia
+                          ticket: INT-609
+                        updatedAt: "2026-03-07T01:10:00.000Z"
+                  - id: stage-07-qa-precheck
+                    title: QA Precheck
+                    start: "2026-03-07T01:15:00.000Z"
+                    processes:
+                      - id: proc-023
+                        title: Prepare smoke matrix
+                        startAt: "2026-03-07T01:15:00.000Z"
+                        plannedEndAt: "2026-03-07T01:50:00.000Z"
+                        durationMin: 35
+                        status: done
+                        meta:
+                          owner: Fedor
+                          ticket: QA-701
+                        updatedAt: "2026-03-07T01:50:00.000Z"
+                      - id: proc-024
+                        title: Run smoke checks
+                        startAt: "2026-03-07T01:55:00.000Z"
+                        plannedEndAt: "2026-03-07T02:35:00.000Z"
+                        durationMin: 40
+                        status: ok
+                        meta:
+                          owner: Anna
+                          ticket: QA-704
+                        updatedAt: "2026-03-07T02:35:00.000Z"
+                      - id: proc-025
+                        title: Collect flaky tests
+                        startAt: "2026-03-07T02:40:00.000Z"
+                        plannedEndAt: "2026-03-07T03:20:00.000Z"
+                        durationMin: 40
+                        status: delayed
+                        delayReason: Test cluster overload
+                        meta:
+                          owner: Ilya
+                          ticket: QA-707
+                        updatedAt: "2026-03-07T03:20:00.000Z"
+                      - id: proc-026
+                        title: Publish QA summary
+                        startAt: "2026-03-07T03:25:00.000Z"
+                        plannedEndAt: "2026-03-07T04:00:00.000Z"
+                        durationMin: 35
+                        status: ok
+                        meta:
+                          owner: Pavel
+                          ticket: QA-709
+                        updatedAt: "2026-03-07T04:00:00.000Z"
+                  - id: stage-08-release-prep
+                    title: Release Prep
+                    start: "2026-03-07T04:05:00.000Z"
+                    processes:
+                      - id: proc-027
+                        title: Generate release bundle
+                        startAt: "2026-03-07T04:05:00.000Z"
+                        plannedEndAt: "2026-03-07T04:45:00.000Z"
+                        durationMin: 40
+                        status: done
+                        meta:
+                          owner: Oleg
+                          ticket: REL-801
+                        updatedAt: "2026-03-07T04:45:00.000Z"
+                      - id: proc-028
+                        title: Sign artifacts
+                        startAt: "2026-03-07T04:50:00.000Z"
+                        plannedEndAt: "2026-03-07T05:35:00.000Z"
+                        durationMin: 45
+                        status: done
+                        meta:
+                          owner: Roman
+                          ticket: REL-804
+                        updatedAt: "2026-03-07T05:35:00.000Z"
+                      - id: proc-029
+                        title: Upload manifest
+                        startAt: "2026-03-07T05:40:00.000Z"
+                        plannedEndAt: "2026-03-07T06:15:00.000Z"
+                        durationMin: 35
+                        status: ok
+                        meta:
+                          owner: Marina
+                          ticket: REL-807
+                        updatedAt: "2026-03-07T06:15:00.000Z"
+                  - id: stage-09-release-window
+                    title: Release Window
+                    start: "2026-03-07T06:20:00.000Z"
+                    processes:
+                      - id: proc-030
+                        title: Deploy canary
+                        startAt: "2026-03-07T06:20:00.000Z"
+                        plannedEndAt: "2026-03-07T07:05:00.000Z"
+                        durationMin: 45
+                        status: done
+                        meta:
+                          owner: Denis
+                          ticket: REL-901
+                        updatedAt: "2026-03-07T07:05:00.000Z"
+                      - id: proc-031
+                        title: Monitor canary metrics
+                        startAt: "2026-03-07T07:10:00.000Z"
+                        plannedEndAt: "2026-03-07T08:00:00.000Z"
+                        durationMin: 50
+                        status: done
+                        meta:
+                          owner: Natalia
+                          ticket: REL-903
+                        updatedAt: "2026-03-07T08:00:00.000Z"
+                      - id: proc-032
+                        title: Full rollout
+                        startAt: "2026-03-07T08:05:00.000Z"
+                        plannedEndAt: "2026-03-07T08:55:00.000Z"
+                        durationMin: 50
+                        status: ok
+                        meta:
+                          owner: Fedor
+                          ticket: REL-905
+                        updatedAt: "2026-03-07T08:55:00.000Z"
+                      - id: proc-033
+                        title: Post-rollout checks
+                        startAt: "2026-03-07T09:00:00.000Z"
+                        plannedEndAt: "2026-03-07T09:35:00.000Z"
+                        durationMin: 35
+                        status: ok
+                        meta:
+                          owner: Alina
+                          ticket: REL-907
+                        updatedAt: "2026-03-07T09:35:00.000Z"
+                  - id: stage-10-post-release
+                    title: Post Release
+                    start: "2026-03-07T09:40:00.000Z"
+                    processes:
+                      - id: proc-034
+                        title: Close release tasks
+                        startAt: "2026-03-07T09:40:00.000Z"
+                        plannedEndAt: "2026-03-07T10:20:00.000Z"
+                        durationMin: 40
+                        status: done
+                        meta:
+                          owner: Kirill
+                          ticket: POST-1001
+                        updatedAt: "2026-03-07T10:20:00.000Z"
+                      - id: proc-035
+                        title: Publish release notes
+                        startAt: "2026-03-07T10:25:00.000Z"
+                        plannedEndAt: "2026-03-07T11:15:00.000Z"
+                        durationMin: 50
+                        status: ok
+                        meta:
+                          owner: Anna
+                          ticket: POST-1004
+                        updatedAt: "2026-03-07T11:15:00.000Z"
+                      - id: proc-036
+                        title: Archive artifacts
+                        startAt: "2026-03-07T11:20:00.000Z"
+                        plannedEndAt: "2026-03-07T12:00:00.000Z"
+                        durationMin: 40
+                        status: done
+                        meta:
+                          owner: Roman
+                          ticket: POST-1008
+                        updatedAt: "2026-03-07T12:00:00.000Z"
+  /api/stages/{stageId}/processes/{processId}:
+    patch:
+      summary: Update process fields
+      operationId: patchProcess
+      parameters:
+        - name: stageId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: processId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProcessPatch"
+            example:
+              status: delayed
+              durationMin: 130
+              comment: Waiting for upstream fix
+              delayReason: Partner token expired
+      responses:
+        "200":
+          description: Process accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+              example:
+                ok: true
+                message: Process patch accepted by mock backend
+
+components:
+  schemas:
+    ProcessStatus:
+      type: string
+      enum: [ok, delayed, blocked, done]
+
+    Process:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - title
+        - durationMin
+        - status
+        - updatedAt
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        plannedEndAt:
+          type: string
+          format: date-time
+        durationMin:
+          type: integer
+          minimum: 1
+        status:
+          $ref: "#/components/schemas/ProcessStatus"
+        comment:
+          type: string
+        delayReason:
+          type: string
+        meta:
+          type: object
+          additionalProperties:
+            oneOf:
+              - type: string
+              - type: number
+              - type: boolean
+              - type: "null"
+        updatedAt:
+          type: string
+          format: date-time
+
+    Stage:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - title
+        - start
+        - processes
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        start:
+          type: string
+          format: date-time
+        processes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Process"
+
+    StagesResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - generatedAt
+        - source
+        - stages
+      properties:
+        generatedAt:
+          type: string
+          format: date-time
+        source:
+          type: string
+        stages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Stage"
+
+    ProcessPatch:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          $ref: "#/components/schemas/ProcessStatus"
+        durationMin:
+          type: integer
+          minimum: 1
+        comment:
+          type: string
+        delayReason:
+          type: string
+
+    OkResponse:
+      type: object
+      additionalProperties: false
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+        message:
+          type: string
