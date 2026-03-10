@@ -462,6 +462,7 @@ export function StagesGantt() {
     pendingUpdatesRef.current = [];
     applyStages(nextStages);
   }, [applyStages]);
+  //test comment
 
   const queueProcessUpdate = useCallback(
     (update: PendingProcessUpdate, immediate: boolean) => {
