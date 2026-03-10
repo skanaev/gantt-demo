@@ -1,7 +1,20 @@
-import { Button, Tooltip } from "@admiral-ds/react-ui";
+import { Button, Tag, T, Tooltip } from "@admiral-ds/react-ui";
 import type { FocusEvent, KeyboardEvent, RefObject } from "react";
+import {
+  TooltipCard,
+  TooltipHeader,
+  TooltipItem,
+  TooltipItemHeader,
+  TooltipList,
+  TooltipMeta,
+  TooltipTitleBlock,
+} from "./styles";
+import { STATUS_KIND_BY_PROCESS_STATUS, STATUS_LABEL_BY_PROCESS_STATUS } from "./presentation";
 import type { ComputedStageTask, Stage } from "./types";
 import { formatDuration } from "./utils";
+
+const TOOLTIP_VIEWPORT_GAP_PX = 12;
+const TOOLTIP_MIN_HEIGHT_PX = 180;
 
 interface ProcessTooltipProps {
   open: boolean;
@@ -30,6 +43,15 @@ export function ProcessTooltip({
     return null;
   }
 
+  const targetRect = targetElement.getBoundingClientRect();
+  const spaceAbove = Math.max(0, targetRect.top - TOOLTIP_VIEWPORT_GAP_PX);
+  const spaceBelow = Math.max(0, window.innerHeight - targetRect.bottom - TOOLTIP_VIEWPORT_GAP_PX);
+  const tooltipPosition = spaceBelow >= spaceAbove ? "bottom" : "top";
+  const tooltipMaxHeight = Math.max(
+    TOOLTIP_MIN_HEIGHT_PX,
+    (tooltipPosition === "bottom" ? spaceBelow : spaceAbove) - TOOLTIP_VIEWPORT_GAP_PX,
+  );
+
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Escape") {
       event.stopPropagation();
@@ -50,12 +72,12 @@ export function ProcessTooltip({
       className="process-tooltip-shell"
       ref={tooltipRef}
       targetElement={targetElement}
-      tooltipPosition="bottom"
+      tooltipPosition={tooltipPosition}
       renderContent={() => (
-        <div
-          className="process-tooltip"
+        <TooltipCard
+          $maxHeight={tooltipMaxHeight}
           role="dialog"
-          aria-label={`Процессы этапа ${stage.title}`}
+          aria-label={`Processes for ${stage.title}`}
           onMouseEnter={onKeepOpen}
           onMouseLeave={onScheduleClose}
           onFocusCapture={onKeepOpen}
@@ -63,42 +85,80 @@ export function ProcessTooltip({
           onKeyDown={onKeyDown}
           tabIndex={-1}
         >
-          <div className="process-tooltip__header">
-            <div>
-              <div className="process-tooltip__title">{stage.title}</div>
-              <div className="process-tooltip__summary">
-                Длительность: {formatDuration(computed.totalDurationMin)} | Прогресс: {computed.progressPercent}%
-              </div>
-            </div>
-            <Button type="button" appearance="ghost" dimension="s" onClick={onRequestClose}>
-              Закрыть
-            </Button>
-          </div>
+          <TooltipHeader>
+            <TooltipTitleBlock>
+              <T as="div" font="Subtitle/Subtitle 2">
+                {stage.title}
+              </T>
+              <T as="div" font="Body/Body 2 Long" color="Neutral/Neutral 50">
+                Duration: {formatDuration(computed.totalDurationMin)} | Progress: {computed.progressPercent}% | Processes:{" "}
+                {computed.processCount}
+              </T>
+            </TooltipTitleBlock>
 
-          <ul className="process-tooltip__list">
+            <Button type="button" appearance="ghost" dimension="s" onClick={onRequestClose}>
+              Close
+            </Button>
+          </TooltipHeader>
+
+          <TooltipList>
             {stage.processes.map((process) => (
-              <li key={process.id} className="process-tooltip__item">
-                <div className="process-tooltip__row">
-                  <span className="process-tooltip__name">{process.title}</span>
-                  <span className={`status-chip status-chip--${process.status}`}>{process.status}</span>
-                </div>
-                <div className="process-tooltip__meta">
-                  {formatDuration(process.durationMin)}
-                  {process.delayReason ? ` | ${process.delayReason}` : ""}
-                </div>
+              <TooltipItem key={process.id}>
+                <TooltipItemHeader>
+                  <div>
+                    <T as="div" font="Subtitle/Subtitle 3">
+                      {process.title}
+                    </T>
+                    <T as="div" font="Body/Body 2 Long" color="Neutral/Neutral 50">
+                      {formatDuration(process.durationMin)}
+                    </T>
+                  </div>
+
+                  <Tag dimension="s" kind={STATUS_KIND_BY_PROCESS_STATUS[process.status]}>
+                    {STATUS_LABEL_BY_PROCESS_STATUS[process.status]}
+                  </Tag>
+                </TooltipItemHeader>
+
+                <TooltipMeta>
+                  {process.regStartDate ? (
+                    <Tag dimension="s" kind="neutral">
+                      Reg start: {process.regStartDate.toLocaleString()}
+                    </Tag>
+                  ) : null}
+                  {process.regFinishDate ? (
+                    <Tag dimension="s" kind="neutral">
+                      Reg end: {process.regFinishDate.toLocaleString()}
+                    </Tag>
+                  ) : null}
+                  {process.startAt ? (
+                    <Tag dimension="s" kind="neutral">
+                      Start: {process.startAt.toLocaleString()}
+                    </Tag>
+                  ) : null}
+                  {process.plannedEndAt ? (
+                    <Tag dimension="s" kind="neutral">
+                      End: {process.plannedEndAt.toLocaleString()}
+                    </Tag>
+                  ) : null}
+                  {process.delayReason ? (
+                    <Tag dimension="s" kind="warning">
+                      {process.delayReason}
+                    </Tag>
+                  ) : null}
+                </TooltipMeta>
+
                 <Button
                   type="button"
-                  className="process-tooltip__open"
                   appearance="secondary"
                   dimension="s"
                   onClick={() => onProcessOpen(stage.id, process.id)}
                 >
-                  Подробнее
+                  Details
                 </Button>
-              </li>
+              </TooltipItem>
             ))}
-          </ul>
-        </div>
+          </TooltipList>
+        </TooltipCard>
       )}
     />
   );

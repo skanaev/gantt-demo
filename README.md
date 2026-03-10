@@ -1,5 +1,15 @@
 # React + TypeScript + Vite
 
+## GitHub Pages demo
+
+The repository is prepared for static preview deployment to GitHub Pages.
+
+- GitHub Pages builds use `VITE_STAGES_DATA_MODE=demo`, so the app loads built-in data from `public/demo/stages.json`.
+- The workflow lives in `.github/workflows/deploy-pages.yml`.
+- Vite `base` is controlled by `VITE_APP_BASE_PATH`, so the app can be served from `/<repo>/`.
+
+After pushing to `main`, enable GitHub Pages in the repository settings and choose `GitHub Actions` as the source.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

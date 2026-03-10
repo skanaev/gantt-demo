@@ -1,5 +1,27 @@
-import { Button, Checkbox, Modal, ModalButtonPanel, ModalContent, ModalTitle } from "@admiral-ds/react-ui";
-import { useEffect, useMemo, useState } from "react";
+import {
+  Button,
+  Modal,
+  ModalButtonPanel,
+  ModalContent,
+  ModalTitle,
+  NumberInputField,
+  Option,
+  SelectField,
+  T,
+  TextField,
+} from "@admiral-ds/react-ui";
+import { useState, type ChangeEvent } from "react";
+import {
+  FormGrid,
+  MetaHint,
+  MetaKey,
+  MetaList,
+  MetaRow,
+  MetaSection,
+  MetaValue,
+  ModalIntro,
+} from "./styles";
+import { STATUS_KIND_BY_PROCESS_STATUS, STATUS_LABEL_BY_PROCESS_STATUS } from "./presentation";
 import type { ProcessPatch, ProcessStatus, Stage, StageProcess } from "./types";
 import { formatDuration } from "./utils";
 
@@ -11,34 +33,28 @@ interface ProcessDetailsModalProps {
   onSave: (stageId: string, processId: string, patch: ProcessPatch) => void;
 }
 
-const STATUS_OPTIONS: ProcessStatus[] = ["ok", "delayed", "blocked", "done"];
+const STATUS_OPTIONS: ProcessStatus[] = ["QUEUED", "IN_WORK", "COMPLETED", "EXPIRED"];
+
+const parseDurationValue = (raw: string, fallback: number): number => {
+  const digitsOnly = raw.replace(/[^\d]/g, "");
+  const parsed = Number(digitsOnly);
+  if (!Number.isFinite(parsed) || parsed < 1) {
+    return fallback;
+  }
+  return parsed;
+};
 
 export function ProcessDetailsModal({ open, stage, process, onClose, onSave }: ProcessDetailsModalProps) {
   const [durationMin, setDurationMin] = useState<number>(process?.durationMin ?? 1);
-  const [status, setStatus] = useState<ProcessStatus>(process?.status ?? "ok");
+  const [status, setStatus] = useState<ProcessStatus>(process?.status ?? "QUEUED");
   const [comment, setComment] = useState<string>(process?.comment ?? "");
   const [delayReason, setDelayReason] = useState<string>(process?.delayReason ?? "");
-
-  useEffect(() => {
-    if (!open || !process) {
-      return;
-    }
-    setDurationMin(process.durationMin);
-    setStatus(process.status);
-    setComment(process.comment ?? "");
-    setDelayReason(process.delayReason ?? "");
-  }, [open, process]);
-
-  const metaEntries = useMemo(() => {
-    if (!process) {
-      return [];
-    }
-    return Object.entries(process.meta);
-  }, [process]);
 
   if (!open || !stage || !process) {
     return null;
   }
+
+  const metaEntries = Object.entries(process.meta);
 
   const saveChanges = () => {
     onSave(stage.id, process.id, {
@@ -50,82 +66,102 @@ export function ProcessDetailsModal({ open, stage, process, onClose, onSave }: P
     onClose();
   };
 
-  const markDone = () => {
-    setStatus("done");
-  };
-
   return (
     <Modal
       onClose={onClose}
       closeOnEscapeKeyDown
       closeOnOutsideClick
       displayCloseIcon
-      aria-label={`Редактирование процесса ${process.title}`}
+      aria-label={`Edit process ${process.title}`}
     >
       <ModalTitle>{process.title}</ModalTitle>
       <ModalContent>
-        <div className="process-modal__section">
-          <div className="process-modal__stage">Этап: {stage.title}</div>
-          <div className="process-modal__updated">Последнее обновление: {process.updatedAt.toLocaleString()}</div>
-        </div>
+        <ModalIntro>
+          <T as="div" font="Body/Body 2 Long" color="Neutral/Neutral 50">
+            Stage: {stage.title}
+          </T>
+          <T as="div" font="Body/Body 2 Long" color="Neutral/Neutral 50">
+            Last update: {process.updatedAt.toLocaleString()}
+          </T>
+          <T as="div" font="Body/Body 2 Long" color="Neutral/Neutral 50">
+            Current status: {STATUS_LABEL_BY_PROCESS_STATUS[process.status]}
+          </T>
+        </ModalIntro>
 
-        <div className="process-modal__section process-modal__fields">
-          <label className="process-modal__label">
-            <span>Статус</span>
-            <select value={status} onChange={(event) => setStatus(event.target.value as ProcessStatus)}>
-              {STATUS_OPTIONS.map((option) => (
-                <option value={option} key={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="process-modal__label">
-            <span>Duration (мин)</span>
-            <input
-              type="number"
-              min={1}
-              value={durationMin}
-              onChange={(event) => setDurationMin(Math.max(1, Number(event.target.value)))}
-            />
-          </label>
-
-          <label className="process-modal__label process-modal__checkbox">
-            <Checkbox checked={status === "done"} onChange={markDone} />
-            <span>Пометить выполненным</span>
-          </label>
-
-          <label className="process-modal__label">
-            <span>Комментарий</span>
-            <textarea value={comment} onChange={(event) => setComment(event.target.value)} rows={3} />
-          </label>
-
-          <label className="process-modal__label">
-            <span>Причина задержки</span>
-            <textarea value={delayReason} onChange={(event) => setDelayReason(event.target.value)} rows={2} />
-          </label>
-        </div>
-
-        <div className="process-modal__section">
-          <div className="process-modal__subtitle">Meta</div>
-          <dl className="process-modal__meta">
-            {metaEntries.map(([key, value]) => (
-              <div key={key}>
-                <dt>{key}</dt>
-                <dd>{String(value)}</dd>
-              </div>
+        <FormGrid>
+          <SelectField
+            label="Status"
+            value={status}
+            onChange={(event: ChangeEvent<HTMLSelectElement>) => setStatus(event.target.value as ProcessStatus)}
+          >
+            {STATUS_OPTIONS.map((option) => (
+              <Option value={option} key={option}>
+                {STATUS_LABEL_BY_PROCESS_STATUS[option]}
+              </Option>
             ))}
-          </dl>
-          <div className="process-modal__hint">Текущая длительность: {formatDuration(process.durationMin)}</div>
-        </div>
+          </SelectField>
+
+          <NumberInputField
+            label="Duration, min"
+            value={String(durationMin)}
+            precision={0}
+            minValue={1}
+            step={1}
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              setDurationMin(parseDurationValue(event.target.value, process.durationMin))
+            }
+          />
+
+          <TextField
+            label="Comment"
+            value={comment}
+            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setComment(event.target.value)}
+            autoHeight={{ minRows: 3, maxRows: 6 }}
+          />
+
+          <TextField
+            label="Delay reason"
+            value={delayReason}
+            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setDelayReason(event.target.value)}
+            autoHeight={{ minRows: 2, maxRows: 5 }}
+          />
+        </FormGrid>
+
+        <MetaSection>
+          <T as="div" font="Subtitle/Subtitle 2">
+            Meta
+          </T>
+          <MetaList>
+            {metaEntries.map(([key, value]) => (
+              <MetaRow key={key}>
+                <MetaKey>
+                  <T as="span" font="Body/Body 2 Long" color="Neutral/Neutral 50">
+                    {key}
+                  </T>
+                </MetaKey>
+                <MetaValue>
+                  <T as="span" font="Body/Body 2 Long">
+                    {String(value)}
+                  </T>
+                </MetaValue>
+              </MetaRow>
+            ))}
+          </MetaList>
+
+          <MetaHint>
+            <T as="div" font="Body/Body 2 Long">
+              Planned duration: {formatDuration(process.durationMin)} | Status token:{" "}
+              {STATUS_KIND_BY_PROCESS_STATUS[status]}
+            </T>
+          </MetaHint>
+        </MetaSection>
       </ModalContent>
       <ModalButtonPanel>
         <Button type="button" appearance="primary" onClick={saveChanges}>
-          Сохранить
+          Save
         </Button>
         <Button type="button" appearance="secondary" onClick={onClose}>
-          Отмена
+          Cancel
         </Button>
       </ModalButtonPanel>
     </Modal>

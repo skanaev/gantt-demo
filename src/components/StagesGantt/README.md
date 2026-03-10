@@ -5,9 +5,9 @@ This document explains how `StagesGantt` works end-to-end after migration to Adm
 ## 1) What the widget does
 
 - Renders one Gantt row per stage (processes are not separate rows).
-- Stage bar length is strict: `end = start + sum(process.durationMin)`.
-- Stage progress is derived from `done` process durations.
-- Stage color is derived from process statuses (`ok`, `delayed`, `blocked`, `done`).
+- Stage bar length is derived from process dates, not from raw duration sum.
+- Stage progress is derived from `COMPLETED` process durations.
+- Stage color is derived from process statuses (`QUEUED`, `IN_WORK`, `COMPLETED`, `EXPIRED`).
 - Time scale can switch (`hour`, `day`, `week`, `month`).
 - Tooltip is interactive and anchored to the stage bar.
 - Modal edits process fields and updates chart immediately.
@@ -21,20 +21,21 @@ This document explains how `StagesGantt` works end-to-end after migration to Adm
 - `StagesGantt.tsx`: orchestration, effects, batching, chart sync.
 - `ProcessTooltip.tsx`: Admiral `Tooltip` with clickable process actions.
 - `ProcessDetailsModal.tsx`: Admiral `Modal` with process edit actions.
-- `styles.css`: chart skin + tooltip/modal/layout styles.
+- `styles.tsx`: AdmiralDS layout wrappers + themed chart/tooltip/modal styling.
+- `styles.css`: base `frappe-gantt` stylesheet import only.
 
 ## 3) Data model and derived values
 
 Input model:
 - `Stage`: `id`, `title`, `start`, `processes[]`.
-- `StageProcess`: `durationMin`, `status`, `comment`, `delayReason`, `meta`, timestamps.
+- `StageProcess`: `durationMin`, `status`, `comment`, `delayReason`, `meta`, `startAt`, `plannedEndAt`, `regStartDate`, `regFinishDate`.
 
 Derived model (`computeStageTask`):
-- `totalDurationMin`: sum of all normalized process durations.
-- `end`: `start + totalDurationMin`.
-- `doneDurationMin`: sum of durations with `status === "done"`.
+- `start`: regulatory start by default, or actual start when the previous process finished earlier.
+- `end`: max date among process finish dates inside the stage.
+- `doneDurationMin`: sum of durations with `status === "COMPLETED"`.
 - `progressPercent`: `doneDurationMin / totalDurationMin * 100`.
-- `derivedStatus`: priority `blocked > delayed > ok`; if all done then `done`.
+- `derivedStatus`: priority `EXPIRED > IN_WORK > QUEUED`; if all completed then `COMPLETED`.
 
 Normalization:
 - Duration is clamped to at least `1`.
@@ -50,7 +51,7 @@ Imperative integration:
 - `ganttRef`: external chart instance (`refresh`, `update_task`, `change_view_mode`).
 
 Async state snapshots (avoid stale closure):
-- `stagesRef`, `viewModeRef`: always-current values inside intervals/callbacks.
+- `stagesRef`: always-current value inside intervals/callbacks.
 - `pendingUpdatesRef`: in-memory queue for incoming process patches.
 - `previousTaskMapRef`: previous chart tasks for diff-based minimal updates.
 
@@ -143,7 +144,7 @@ Recommended:
 - `Tooltip`: process list overlay.
 - `Modal`, `ModalTitle`, `ModalContent`, `ModalButtonPanel`: process editor.
 - `Button`: actions in tooltip and modal.
-- `Checkbox`: live-update toggle and done marker.
+- `Checkbox`: live-update toggle.
 - Root setup in `main.tsx`: `QueryClientProvider`, `ThemeProvider`, `DropdownProvider`, `FontsVTBGroup`.
 
 ## 11) Extension points

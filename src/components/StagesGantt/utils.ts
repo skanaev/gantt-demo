@@ -9,7 +9,14 @@ import type {
   StageTaskViewModel,
 } from "./types";
 
-const STATUS_PRIORITY: StageStatus[] = ["blocked", "delayed", "ok", "done"];
+const STATUS_PRIORITY: StageStatus[] = ["EXPIRED", "IN_WORK", "QUEUED", "COMPLETED"];
+const BAR_CLASS_BY_STAGE_STATUS: Record<StageStatus, string> = {
+  QUEUED: "stage-bar--queued",
+  IN_WORK: "stage-bar--in-work",
+  COMPLETED: "stage-bar--completed",
+  EXPIRED: "stage-bar--expired",
+};
+const MAX_STAGE_BAR_TITLE_CHARS = 20;
 
 export type FrappeTaskModel = Gantt.Task & {
   id: string;
@@ -19,8 +26,6 @@ export type FrappeTaskModel = Gantt.Task & {
   progress: number;
   custom_class?: string;
 };
-
-type FrappeViewMode = Gantt.viewMode;
 const MAX_TIMELINE_AIR_HOURS = 5;
 
 export interface TimelinePadding {
@@ -43,12 +48,12 @@ const normalizeDuration = (durationMin: number): number => {
 
 export const deriveStageStatus = (processes: StageProcess[]): StageStatus => {
   if (processes.length === 0) {
-    return "ok";
+    return "QUEUED";
   }
 
-  const allDone = processes.every((process) => process.status === "done");
+  const allDone = processes.every((process) => process.status === "COMPLETED");
   if (allDone) {
-    return "done";
+    return "COMPLETED";
   }
 
   for (const status of STATUS_PRIORITY) {
@@ -57,30 +62,85 @@ export const deriveStageStatus = (processes: StageProcess[]): StageStatus => {
     }
   }
 
-  return "ok";
+  return "QUEUED";
+};
+
+const toTimestamp = (value?: Date): number | null => {
+  return value ? value.getTime() : null;
+};
+
+const resolveProcessDisplayEndTs = (process: StageProcess): number | null => {
+  const candidates = [
+    toTimestamp(process.plannedEndAt),
+    toTimestamp(process.regFinishDate),
+    toTimestamp(process.startAt),
+    toTimestamp(process.regStartDate),
+  ].filter((value): value is number => value !== null);
+
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  return Math.max(...candidates);
+};
+
+const resolveProcessDisplayStartTs = (
+  process: StageProcess,
+  previousProcessEndTs: number | null,
+  stageStartTs: number,
+): number => {
+  const actualStartTs = toTimestamp(process.startAt);
+  const regStartTs = toTimestamp(process.regStartDate);
+
+  if (actualStartTs !== null && previousProcessEndTs !== null && previousProcessEndTs < actualStartTs) {
+    return actualStartTs;
+  }
+
+  if (regStartTs !== null) {
+    return regStartTs;
+  }
+
+  if (actualStartTs !== null) {
+    return actualStartTs;
+  }
+
+  return stageStartTs;
 };
 
 export const computeStageTask = (stage: Stage): ComputedStageTask => {
-  const processStarts = stage.processes
-    .map((process) => process.startAt?.getTime())
-    .filter((value): value is number => Number.isFinite(value));
-  const stageStart = processStarts.length > 0 ? new Date(Math.min(...processStarts)) : stage.start;
+  const stageStartTs = stage.start.getTime();
+  let minStageStartTs = Number.POSITIVE_INFINITY;
+  let maxStageEndTs = Number.NEGATIVE_INFINITY;
+  let previousProcessEndTs: number | null = null;
+
+  for (const process of stage.processes) {
+    const processStartTs = resolveProcessDisplayStartTs(process, previousProcessEndTs, stageStartTs);
+    const processEndTs = resolveProcessDisplayEndTs(process) ?? addMinutes(new Date(processStartTs), process.durationMin).getTime();
+
+    minStageStartTs = Math.min(minStageStartTs, processStartTs);
+    maxStageEndTs = Math.max(maxStageEndTs, processEndTs);
+    previousProcessEndTs = processEndTs;
+  }
+
+  const stageStart = Number.isFinite(minStageStartTs) ? new Date(minStageStartTs) : stage.start;
   const processCount = stage.processes.length;
-  const totalDurationMin = stage.processes.reduce(
+  const totalWorkDurationMin = stage.processes.reduce(
     (acc, process) => acc + normalizeDuration(process.durationMin),
     0,
   );
   const doneDurationMin = stage.processes.reduce((acc, process) => {
-    if (process.status !== "done") {
+    if (process.status !== "COMPLETED") {
       return acc;
     }
     return acc + normalizeDuration(process.durationMin);
   }, 0);
 
-  const doneCount = stage.processes.filter((process) => process.status === "done").length;
+  const doneCount = stage.processes.filter((process) => process.status === "COMPLETED").length;
   const progressPercent =
-    totalDurationMin <= 0 ? 0 : Math.min(100, Math.round((doneDurationMin / totalDurationMin) * 100));
-  const end = addMinutes(stageStart, totalDurationMin);
+    totalWorkDurationMin <= 0 ? 0 : Math.min(100, Math.round((doneDurationMin / totalWorkDurationMin) * 100));
+  const fallbackEnd = addMinutes(stageStart, totalWorkDurationMin);
+  const end = Number.isFinite(maxStageEndTs) ? new Date(maxStageEndTs) : fallbackEnd;
+  const totalDurationMin = Math.max(1, Math.round((end.getTime() - stageStart.getTime()) / 60_000));
   const derivedStatus = deriveStageStatus(stage.processes);
 
   return {
@@ -101,68 +161,37 @@ export const toStageTaskViewModel = (stage: Stage): StageTaskViewModel => {
   const computed = computeStageTask(stage);
   return {
     ...computed,
-    barClassName: `stage-bar--${computed.derivedStatus}`,
+    barClassName: BAR_CLASS_BY_STAGE_STATUS[computed.derivedStatus],
   };
+};
+
+const truncateStageTitleForBar = (title: string): string => {
+  const normalizedTitle = title.replace(/\s+/g, " ").trim();
+  if (normalizedTitle.length <= MAX_STAGE_BAR_TITLE_CHARS) {
+    return normalizedTitle;
+  }
+  return `${normalizedTitle.slice(0, MAX_STAGE_BAR_TITLE_CHARS - 1).trimEnd()}…`;
 };
 
 export const toFrappeTask = (stageTask: StageTaskViewModel): FrappeTaskModel => {
   const toFrappeDate = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = `${date.getMonth() + 1}`.padStart(2, "0");
-    const day = `${date.getDate()}`.padStart(2, "0");
-    const hours = `${date.getHours()}`.padStart(2, "0");
-    const minutes = `${date.getMinutes()}`.padStart(2, "0");
-    const seconds = `${date.getSeconds()}`.padStart(2, "0");
+    const year = date.getUTCFullYear();
+    const month = `${date.getUTCMonth() + 1}`.padStart(2, "0");
+    const day = `${date.getUTCDate()}`.padStart(2, "0");
+    const hours = `${date.getUTCHours()}`.padStart(2, "0");
+    const minutes = `${date.getUTCMinutes()}`.padStart(2, "0");
+    const seconds = `${date.getUTCSeconds()}`.padStart(2, "0");
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   };
 
   return {
     id: stageTask.stageId,
-    name: stageTask.stageTitle,
+    name: `${stageTask.doneCount}/${stageTask.processCount} ${truncateStageTitleForBar(stageTask.stageTitle)}`,
     start: toFrappeDate(stageTask.start),
     end: toFrappeDate(stageTask.end),
     progress: stageTask.progressPercent,
     custom_class: stageTask.barClassName,
   };
-};
-
-export const mapViewModeToFrappe = (mode: ManualGanttViewMode): FrappeViewMode => {
-  if (mode === "hour") {
-    return "Hour";
-  }
-  if (mode === "day") {
-    return "Day";
-  }
-  if (mode === "week") {
-    return "Week";
-  }
-  return "Month";
-};
-
-export const pickAutoViewMode = (tasks: StageTaskViewModel[]): ManualGanttViewMode => {
-  if (tasks.length === 0) {
-    return "day";
-  }
-
-  let minStartTs = Number.POSITIVE_INFINITY;
-  let maxEndTs = Number.NEGATIVE_INFINITY;
-
-  for (const task of tasks) {
-    minStartTs = Math.min(minStartTs, task.start.getTime());
-    maxEndTs = Math.max(maxEndTs, task.end.getTime());
-  }
-
-  const spanMinutes = Math.max(1, (maxEndTs - minStartTs) / 60_000);
-  if (spanMinutes <= 72 * 60) {
-    return "hour";
-  }
-  if (spanMinutes <= 90 * 24 * 60) {
-    return "day";
-  }
-  if (spanMinutes <= 365 * 24 * 60) {
-    return "week";
-  }
-  return "month";
 };
 
 export const computeTimelinePadding = (
@@ -185,22 +214,26 @@ export const computeTimelinePadding = (
   let maxProcessEndTs = Number.NEGATIVE_INFINITY;
   for (const stage of stages) {
     for (const process of stage.processes) {
-      if (process.startAt) {
-        minProcessStartTs = Math.min(minProcessStartTs, process.startAt.getTime());
+      const startCandidates = [process.startAt, process.regStartDate]
+        .filter((value): value is Date => value instanceof Date)
+        .map((value) => value.getTime());
+      const endCandidates = [process.plannedEndAt, process.regFinishDate]
+        .filter((value): value is Date => value instanceof Date)
+        .map((value) => value.getTime());
+
+      if (startCandidates.length > 0) {
+        minProcessStartTs = Math.min(minProcessStartTs, ...startCandidates);
       }
-      if (process.plannedEndAt) {
-        maxProcessEndTs = Math.max(maxProcessEndTs, process.plannedEndAt.getTime());
+      if (endCandidates.length > 0) {
+        maxProcessEndTs = Math.max(maxProcessEndTs, ...endCandidates);
       }
     }
   }
 
-  const rawStartTs = Number.isFinite(minProcessStartTs) ? minProcessStartTs : minTaskStartTs;
-  const desiredStartDate = new Date(rawStartTs);
-  desiredStartDate.setHours(0, 0, 0, 0);
-  const desiredStartTs = desiredStartDate.getTime();
+  const desiredStartTs = Number.isFinite(minProcessStartTs) ? minProcessStartTs : minTaskStartTs;
   const rawEndTs = Number.isFinite(maxProcessEndTs) ? maxProcessEndTs : maxTaskEndTs;
   const desiredEndDate = new Date(rawEndTs);
-  desiredEndDate.setHours(23, 59, 59, 999);
+  desiredEndDate.setUTCHours(23, 59, 59, 999);
   const maxEndAirMinutes = Math.max(0, Math.round(maxEndAirHours * 60));
   const desiredEndTs = desiredEndDate.getTime() + maxEndAirMinutes * 60_000;
 
@@ -218,6 +251,15 @@ const toIntervalSeconds = (milliseconds: number): string => {
   return `${seconds}s`;
 };
 
+const ceilToNextLocalHour = (timestamp: number): number => {
+  const date = new Date(timestamp);
+  date.setMinutes(0, 0, 0);
+  if (date.getTime() < timestamp) {
+    date.setHours(date.getHours() + 1);
+  }
+  return date.getTime();
+};
+
 export const resolveTimelinePaddingForMode = (
   mode: ManualGanttViewMode,
   timeline: TimelinePadding | null,
@@ -229,18 +271,38 @@ export const resolveTimelinePaddingForMode = (
     };
   }
 
-  const desiredStartTs = timeline.desiredStart.getTime();
   const desiredEndTs = timeline.desiredEnd.getTime();
-  const minTaskStartTs = timeline.minTaskStart.getTime();
   const maxTaskEndTs = timeline.maxTaskEnd.getTime();
 
-  const startPadMs = mode === "hour" ? Math.max(0, minTaskStartTs - desiredStartTs) : 0;
-  const endPadMs = Math.max(0, desiredEndTs - maxTaskEndTs);
+  const endPadMs =
+    mode === "hour"
+      ? Math.max(0, ceilToNextLocalHour(maxTaskEndTs) - maxTaskEndTs)
+      : Math.max(0, desiredEndTs - maxTaskEndTs);
 
   return {
-    startPadding: toIntervalSeconds(startPadMs),
+    startPadding: "0s",
     endPadding: toIntervalSeconds(endPadMs),
   };
+};
+
+const DAY_IN_MS = 24 * 60 * 60 * 1000;
+
+const startOfLocalDay = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+};
+
+export const countTimelineUnitsForMode = (mode: ManualGanttViewMode, timeline: TimelinePadding | null): number => {
+  if (!timeline) {
+    return 1;
+  }
+
+  if (mode === "day") {
+    const startTs = startOfLocalDay(timeline.desiredStart).getTime();
+    const endTs = startOfLocalDay(timeline.desiredEnd).getTime();
+    return Math.max(1, Math.round((endTs - startTs) / DAY_IN_MS) + 1);
+  }
+
+  return 1;
 };
 
 export const formatDuration = (minutes: number): string => {
@@ -264,6 +326,8 @@ export const cloneStages = (stages: Stage[]): Stage[] => {
       ...process,
       startAt: process.startAt ? new Date(process.startAt.getTime()) : undefined,
       plannedEndAt: process.plannedEndAt ? new Date(process.plannedEndAt.getTime()) : undefined,
+      regStartDate: process.regStartDate ? new Date(process.regStartDate.getTime()) : undefined,
+      regFinishDate: process.regFinishDate ? new Date(process.regFinishDate.getTime()) : undefined,
       updatedAt: new Date(process.updatedAt.getTime()),
       meta: { ...process.meta },
     })),

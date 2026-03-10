@@ -1,10 +1,19 @@
 import type { ProcessMeta, ProcessStatus, Stage, StageApiDto } from "./types";
 
+export type StagesDataMode = "api" | "demo";
+
 export const STAGES_API_DEFAULT_URL = "http://localhost:3001/api/stages";
 export const PROCESS_UPDATE_API_BASE_DEFAULT_URL = "http://localhost:3001/api/stages";
 export const STAGES_POLL_INTERVAL_MS = 30_000;
+export const DEMO_STAGES_DATA_URL = `${import.meta.env.BASE_URL}demo/stages.json`;
 
-const PROCESS_STATUSES: readonly ProcessStatus[] = ["ok", "delayed", "blocked", "done"];
+const PROCESS_STATUSES: readonly ProcessStatus[] = ["QUEUED", "IN_WORK", "COMPLETED", "EXPIRED"];
+const LEGACY_PROCESS_STATUS_MAP: Record<string, ProcessStatus> = {
+  ok: "IN_WORK",
+  delayed: "EXPIRED",
+  blocked: "QUEUED",
+  done: "COMPLETED",
+};
 
 const isObject = (value: unknown): value is Record<string, unknown> => {
   return typeof value === "object" && value !== null;
@@ -35,7 +44,10 @@ const normalizeStatus = (value: unknown): ProcessStatus => {
   if (typeof value === "string" && PROCESS_STATUSES.includes(value as ProcessStatus)) {
     return value as ProcessStatus;
   }
-  return "ok";
+  if (typeof value === "string" && value in LEGACY_PROCESS_STATUS_MAP) {
+    return LEGACY_PROCESS_STATUS_MAP[value];
+  }
+  return "QUEUED";
 };
 
 const normalizeMeta = (value: unknown): ProcessMeta => {
@@ -69,6 +81,10 @@ const toStageApiDtoArray = (payload: unknown): StageApiDto[] => {
   return [];
 };
 
+export const resolveStagesDataMode = (value: string | undefined): StagesDataMode => {
+  return value === "demo" ? "demo" : "api";
+};
+
 export const parseStagesPayload = (payload: unknown): Stage[] => {
   const rawStages = toStageApiDtoArray(payload);
   if (rawStages.length === 0) {
@@ -92,12 +108,16 @@ export const parseStagesPayload = (payload: unknown): Stage[] => {
           const plannedEndAt = readOptionalDate(
             processRecord.plannedEndAt ?? processRecord.regulatoryEndAt ?? processRecord.end,
           );
+          const regStartDate = readOptionalDate(processRecord.regStartDate ?? processRecord.regulatoryStartAt);
+          const regFinishDate = readOptionalDate(processRecord.regFinishDate ?? processRecord.regulatoryEndAt);
           return {
             id: readString(processRecord.id, `${stageId}-process-${processIndex + 1}`),
             title: readString(processRecord.title, `Process ${processIndex + 1}`),
             durationMin: Math.max(1, Math.round(readNumber(processRecord.durationMin, 1))),
             startAt,
             plannedEndAt,
+            regStartDate,
+            regFinishDate,
             status: normalizeStatus(processRecord.status),
             comment: typeof processRecord.comment === "string" ? processRecord.comment : undefined,
             delayReason: typeof processRecord.delayReason === "string" ? processRecord.delayReason : undefined,
@@ -132,6 +152,19 @@ export const fetchStagesFromApi = async (
   }
 
   return parsedStages;
+};
+
+export const fetchStagesFromSource = async ({
+  mode,
+  apiUrl,
+  signal,
+}: {
+  mode: StagesDataMode;
+  apiUrl: string;
+  signal?: AbortSignal;
+}): Promise<Stage[]> => {
+  const sourceUrl = mode === "demo" ? DEMO_STAGES_DATA_URL : apiUrl;
+  return fetchStagesFromApi(sourceUrl, signal);
 };
 
 export const updateProcessOnApi = async (

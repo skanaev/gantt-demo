@@ -1,8 +1,8 @@
-export type ProcessStatus = "ok" | "delayed" | "blocked" | "done";
+export type ProcessStatus = "QUEUED" | "IN_WORK" | "COMPLETED" | "EXPIRED";
 export type StageStatus = ProcessStatus;
 
 export type ManualGanttViewMode = "hour" | "day" | "week" | "month";
-export type GanttViewMode = "auto" | ManualGanttViewMode;
+export type GanttViewMode = ManualGanttViewMode;
 
 export type ProcessMetaValue = string | number | boolean | null;
 export type ProcessMeta = Record<string, ProcessMetaValue>;
@@ -13,6 +13,8 @@ export interface StageProcess {
   durationMin: number;
   startAt?: Date;
   plannedEndAt?: Date;
+  regStartDate?: Date;
+  regFinishDate?: Date;
   status: ProcessStatus;
   comment?: string;
   delayReason?: string;
@@ -69,6 +71,8 @@ export interface StageProcessApiDto {
   durationMin: number;
   startAt?: string;
   plannedEndAt?: string;
+  regStartDate?: string;
+  regFinishDate?: string;
   status: ProcessStatus;
   comment?: string;
   delayReason?: string;
